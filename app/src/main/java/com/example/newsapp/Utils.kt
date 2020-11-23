@@ -2,9 +2,9 @@ package com.example.newsapp
 
 object Utils {
     const val BASE_URL = "https://newsapi.org/v2/"
-    const val API_KEY = "2c0bc6bd19ae43b2aced20e64a282db3"
 
-
+    //    const val API_KEY = "2c0bc6bd19ae43b2aced20e64a282db3"
+    const val API_KEY = "9d0cf69292f84529bedbba357cdb7a0e"
     val countryCodes = arrayListOf(
         "ae",
         "ar",

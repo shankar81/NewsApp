@@ -1,12 +1,10 @@
 package com.example.newsapp
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Room
 import com.example.newsapp.database.NewsDatabase
+import com.example.newsapp.models.Favourite
 import com.example.newsapp.models.News
-
-private const val TAG = "NewsRepository"
 
 class NewsRepository(context: Context) {
     private val database = Room
@@ -14,14 +12,22 @@ class NewsRepository(context: Context) {
         .build()
 
     private val newsDao = database.newsDao()
+    private val favouriteDao = database.favouriteDao()
 
     suspend fun getNews(category: String): List<News> {
-        Log.d(TAG, "getNews: $category")
         return newsDao.getNews(category)
     }
 
     suspend fun addNews(news: News) {
         return newsDao.addNews(news)
+    }
+
+    suspend fun getFavourites(): List<Favourite> {
+        return favouriteDao.getFavourites()
+    }
+
+    suspend fun addFavourite(news: Favourite) {
+        return favouriteDao.addFavourite(news)
     }
 
     companion object {

@@ -1,7 +1,6 @@
 package com.example.newsapp
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
@@ -51,13 +50,7 @@ class NewsFragment(private val category: String) : Fragment() {
     }
 
     private fun doAPICall() {
-//        mainViewModel.news.observe(viewLifecycleOwner, { newsList ->
-//            news.clear()
-//            news.addAll(newsList)
-//            adapter.notifyDataSetChanged()
-//        })
-//        Log.d(TAG, "doAPICall: $searchQuery")
-//        mainViewModel.getNews(searchQuery, category, country)
+        mainViewModel.getNews(searchQuery, category, country)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -119,6 +112,11 @@ class NewsFragment(private val category: String) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mainViewModel.news.observe(viewLifecycleOwner, { newsList ->
+            news.clear()
+            news.addAll(newsList)
+            adapter.notifyDataSetChanged()
+        })
         doAPICall()
     }
 
@@ -144,12 +142,9 @@ class NewsFragment(private val category: String) : Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsHolder {
             return NewsHolder(layoutInflater.inflate(R.layout.news_list_item, parent, false))
         }
-
         override fun onBindViewHolder(holder: NewsHolder, position: Int) {
             holder.bind(newsList[position])
         }
-
         override fun getItemCount() = newsList.size
-
     }
 }

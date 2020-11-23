@@ -3,4 +3,7 @@
     <string name="trending">Trending</string>
     <string name="news_title">How Coronavirus is going to impact your next trip.</string>
     <string name="news_photo">News Photo</string>
+    <string name="drawer_photo">Drawer photo</string>
+    <string name="name">Shankar Sawant</string>
+    <string name="email">shankarsawant@gmail.com</string>
 </resources>

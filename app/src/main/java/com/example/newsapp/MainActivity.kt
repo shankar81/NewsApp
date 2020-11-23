@@ -1,45 +1,61 @@
 package com.example.newsapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProviders
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.activity_main.*
-
-private const val TAG = "MainActivity"
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.*
+import com.bumptech.glide.Glide
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mainViewModel: MainViewModel
-    private val categories = arrayListOf(
-        "business",
-        "entertainment",
-        "general",
-        "health",
-        "science",
-        "sports",
-        "technology",
-    )
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(topAppBar)
-        mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        val toolbar: Toolbar = findViewById(R.id.topAppBar)
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawerLayout)
+        val navigationView: NavigationView = findViewById(R.id.navigationView)
 
-        newsViewPager.adapter = NewsAdapter(supportFragmentManager, lifecycle)
-        TabLayoutMediator(tabLayout, newsViewPager) { tab, position ->
-            tab.text = categories[position]
-        }.attach()
+        val headerView: View = navigationView.getHeaderView(0)
+
+        val drawerImage: ImageView = headerView.findViewById(R.id.drawerImage)
+        val drawerName: TextView = headerView.findViewById(R.id.drawerName)
+        val drawerEmail: TextView = headerView.findViewById(R.id.drawerEmail)
+
+        drawerName.text = getString(R.string.name)
+        drawerEmail.text = getString(R.string.email)
+        Glide
+            .with(this)
+            .load(R.raw.travel)
+            .circleCrop()
+            .into(drawerImage)
+
+
+        setSupportActionBar(toolbar);
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout)
+
+        appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
+        navigationView.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        toolbar.setupWithNavController(navController, appBarConfiguration)
     }
 
-    private inner class NewsAdapter(manager: FragmentManager, lifecycle: Lifecycle) :
-        FragmentStateAdapter(manager, lifecycle) {
-        override fun getItemCount() = categories.size
-        override fun createFragment(position: Int) = NewsFragment(categories[position])
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
     }
 }

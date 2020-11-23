@@ -1,17 +1,14 @@
 package com.example.newsapp
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.newsapp.api.NetworkService
 import com.example.newsapp.api.NewsApi
+import com.example.newsapp.models.Favourite
 import com.example.newsapp.models.News
 import kotlinx.coroutines.*
-import java.lang.Exception
 import java.util.*
 
-private const val TAG = "MainViewModel"
 
 class MainViewModel : ViewModel() {
     val coroutineScope = CoroutineScope(Dispatchers.Default)
@@ -19,6 +16,7 @@ class MainViewModel : ViewModel() {
     val countryId = arrayListOf<Int>()
     private val repository = NewsRepository.getRepo()
     val news = MutableLiveData<List<News>>()
+    val favourites = MutableLiveData<List<Favourite>>()
 
     init {
         getAllCountries()
@@ -26,7 +24,6 @@ class MainViewModel : ViewModel() {
 
     fun getNews(query: String, category: String, country: String) {
         coroutineScope.launch {
-            Log.d(TAG, "getNews: $query")
             val localNews = repository.getNews(category)
             if (localNews.isEmpty() || query.isNotBlank()) {
                 getNewsOnline(query, category, country)
@@ -39,17 +36,14 @@ class MainViewModel : ViewModel() {
     private fun getNewsOnline(query: String, category: String, country: String) {
         try {
             coroutineScope.launch {
-                Log.d(TAG, "getNewsOnline MakingRequests: ")
                 val res =
                     NetworkService.retrofitService.create(NewsApi::class.java)
                         .getNews(query, category, country)
-                Log.d(TAG, "getNewsOnline MakingRequests: ${res.status}")
                 res.articles.map {
                     it.category = category
                     it.id = UUID.randomUUID().toString()
                 }
                 if (query.isBlank()) {
-                    Log.d(TAG, "Empty Query: $query")
                     withContext(Dispatchers.IO) {
                         res.articles.map {
                             repository.addNews(it)
@@ -57,13 +51,11 @@ class MainViewModel : ViewModel() {
                     }
                     getNews(query, category, country)
                 } else {
-                    Log.d(TAG, "New Query: $query")
                     news.postValue(res.articles)
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.d(TAG, "getNews: Exception")
         }
     }
 
@@ -75,12 +67,22 @@ class MainViewModel : ViewModel() {
             countries[codeUpper] = name
             countryId.add(hashCode)
         }
-        Log.d(TAG, "getAllCountries: ${countries.size}")
+    }
+
+    fun getFavourites() {
+        coroutineScope.launch {
+            favourites.postValue(repository.getFavourites())
+        }
+    }
+
+    fun addFavourite(news: Favourite) {
+        coroutineScope.launch {
+            repository.addFavourite(news)
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
-        Log.d(TAG, "onCleared: ")
         coroutineScope.cancel()
     }
 }

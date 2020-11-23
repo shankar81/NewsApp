@@ -3,13 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/drawer_header_bg"
     android:padding="20dp">
 
     <ImageView
         android:id="@+id/drawerImage"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:contentDescription="Drawer photo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/drawer_photo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -18,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Shankar Sawant"
+        android:textColor="#333"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,10 +30,8 @@
         android:id="@+id/drawerEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="shankarsawant@gmail.com"
         android:textColor="#aaa"
         android:textSize="16sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/drawerName" />
 
