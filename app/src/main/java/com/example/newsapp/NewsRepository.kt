@@ -26,8 +26,26 @@ class NewsRepository(context: Context) {
         return favouriteDao.getFavourites()
     }
 
-    suspend fun addFavourite(news: Favourite) {
-        return favouriteDao.addFavourite(news)
+    suspend fun addFavourite(news: News) {
+        news.apply {
+            return favouriteDao.addFavourite(
+                Favourite(
+                    id,
+                    title,
+                    author,
+                    url,
+                    urlToImage,
+                    publishedAt,
+                    content,
+                    source,
+                    category
+                )
+            )
+        }
+    }
+
+    suspend fun removeFavourite(favourite: Favourite) {
+        return favouriteDao.removeFavourite(favourite)
     }
 
     companion object {

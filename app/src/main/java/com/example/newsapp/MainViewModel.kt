@@ -75,9 +75,15 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun addFavourite(news: Favourite) {
+    fun addFavourite(news: News) {
         coroutineScope.launch {
             repository.addFavourite(news)
+        }
+    }
+
+    fun removeFavourite(favourite: Favourite) {
+        coroutineScope.launch {
+            repository.removeFavourite(favourite)
         }
     }
 

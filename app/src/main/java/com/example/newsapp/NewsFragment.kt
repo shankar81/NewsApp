@@ -5,6 +5,7 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -19,9 +20,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val TAG = "NewsFragment"
+class NewsFragment(private val category: String = "") : Fragment() {
 
-class NewsFragment(private val category: String) : Fragment() {
     private val news = arrayListOf<News>()
     private val adapter = NewsAdapter(news)
     private lateinit var newsRecyclerView: RecyclerView
@@ -83,7 +83,7 @@ class NewsFragment(private val category: String) : Fragment() {
                 mainViewModel.coroutineScope.launch(Dispatchers.Main) {
                     if (newText != null && newText.length % 3 == 0) {
                         delay(5000)
-                        searchQuery = newText.trim().toString()
+                        searchQuery = newText.trim()
                         doAPICall()
                     }
                 }
@@ -124,6 +124,7 @@ class NewsFragment(private val category: String) : Fragment() {
         private val category: TextView = itemView.findViewById(R.id.news_category)
         private val title: TextView = itemView.findViewById(R.id.news_title)
         private val image: ImageView = itemView.findViewById(R.id.news_image)
+        private val favouriteButton: ImageView = itemView.findViewById(R.id.favouriteButton)
 
         fun bind(news: News) {
             title.text = news.title
@@ -134,6 +135,12 @@ class NewsFragment(private val category: String) : Fragment() {
                 .transform(CenterCrop(), RoundedCorners(20))
                 .load(news.urlToImage)
                 .into(image)
+
+            favouriteButton.setOnClickListener {
+                mainViewModel.addFavourite(news)
+                Toast.makeText(context, "Added to favourites", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
@@ -142,9 +149,11 @@ class NewsFragment(private val category: String) : Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsHolder {
             return NewsHolder(layoutInflater.inflate(R.layout.news_list_item, parent, false))
         }
+
         override fun onBindViewHolder(holder: NewsHolder, position: Int) {
             holder.bind(newsList[position])
         }
+
         override fun getItemCount() = newsList.size
     }
 }

@@ -12,8 +12,8 @@ interface FavouriteDao {
     suspend fun getFavourites(): List<Favourite>
 
     @Insert
-    suspend fun addFavourite(news: Favourite)
+    suspend fun addFavourite(favourite: Favourite)
 
     @Delete
-    suspend fun removeFavourite(news: Favourite)
+    suspend fun removeFavourite(favourite: Favourite)
 }
