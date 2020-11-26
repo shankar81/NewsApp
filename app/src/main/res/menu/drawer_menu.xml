@@ -11,5 +11,5 @@
     <item
         android:id="@+id/logout"
         android:icon="@drawable/icon_logout"
-        android:title="Logout" />
+        android:title="Toggle Theme" />
 </menu>

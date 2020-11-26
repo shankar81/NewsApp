@@ -2,6 +2,7 @@ package com.example.newsapp.background
 
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.newsapp.MainActivity
 import com.example.newsapp.NewsApplication
 import com.example.newsapp.NewsRepository
 import com.example.newsapp.R
@@ -90,7 +92,7 @@ class NewsBackgroundService : Service() {
 
     private fun getNotification(currentCategory: String = categories[0]): Notification {
         return NotificationCompat.Builder(baseContext, NewsApplication.CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon_delete)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
             .setProgress(7, 7 - (categories.size - 1), false)
             .setContentTitle("Getting Latest News")
             .setOnlyAlertOnce(true)
@@ -102,16 +104,37 @@ class NewsBackgroundService : Service() {
     private fun showNewsNotification(index: Int, news: News) {
         // Custom Notification Views
         val remoteCustomContent = RemoteViews(packageName, R.layout.notification_content_view)
+
         remoteCustomContent.setTextViewText(R.id.notificationTitle, news.title)
-        remoteCustomContent.setTextViewText(R.id.notificationTitle, news.title)
+        remoteCustomContent.setTextViewText(R.id.notificationTime, news.publishedAt)
+        remoteCustomContent.setImageViewResource(R.id.notificationImage, R.mipmap.ic_launcher_round)
+
         val remoteCustomContentLarge = RemoteViews(packageName, R.layout.notification_large_view)
-        // Converting Resource id to Bitmap with Glide
-        Glide.with(this).asBitmap().load(R.mipmap.travel).into(object : CustomTarget<Bitmap>() {
+
+        remoteCustomContentLarge.setTextViewText(R.id.notificationTitle, news.title)
+        // @TODO Format Date
+        remoteCustomContentLarge.setTextViewText(R.id.notificationTime, news.publishedAt)
+
+        // Converting Resource image to bitmap and setting to notification
+        Glide.with(this).asBitmap().load(news.urlToImage).into(object : CustomTarget<Bitmap>() {
             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                remoteCustomContentLarge.setImageViewBitmap(R.id.notificationImage, resource)
+                val intent = Intent(baseContext, MainActivity::class.java).apply {
+                    putExtra("SOME", "thing")
+                }
+                val pi = PendingIntent.getActivity(
+                    baseContext,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
                 val notification =
                     NotificationCompat.Builder(baseContext, NewsApplication.CHANNEL_ID)
-                        .setSmallIcon(R.drawable.icon_delete)
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
                         .setCustomContentView(remoteCustomContent)
+                        .setContentIntent(pi)
+                        .setOnlyAlertOnce(true)
+                        .setAutoCancel(true)
                         .setCustomBigContentView(remoteCustomContentLarge)
                         .build()
 

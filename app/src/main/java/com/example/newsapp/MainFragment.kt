@@ -1,21 +1,22 @@
 package com.example.newsapp
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+private const val TAG = "MainFragment"
 
 class MainFragment : Fragment() {
     private lateinit var newsViewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
-    private val mainViewModel: MainViewModel by viewModels()
     private val categories = arrayListOf(
         "business",
         "entertainment",
@@ -37,6 +38,11 @@ class MainFragment : Fragment() {
         tabLayout = view.findViewById(R.id.tabLayout)
 
         return view
+    }
+
+    override fun startActivity(intent: Intent?) {
+        super.startActivity(intent)
+        Log.d(TAG, "startActivity: $intent")
     }
 
     override fun onStart() {

@@ -13,7 +13,6 @@
         android:layout_gravity="center_vertical"
         android:contentDescription="Notification Icon"
         android:scaleType="centerCrop"
-        android:src="@mipmap/travel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +25,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Who is 16-year-old Charlie D'Amelio, \nthe world's most-followed person on TikTok?"
         android:textColor="#fff"
         android:textFontWeight="900"
         android:textSize="15sp"
@@ -40,7 +38,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="08:48 AM"
         android:textColor="#fff" />
 
     <LinearLayout

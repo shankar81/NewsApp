@@ -28,7 +28,6 @@ class OnAppKilledService : Service() {
         val constraints = Constraints
             .Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresCharging(true)
             .build()
 
         val periodWorkRequest =
