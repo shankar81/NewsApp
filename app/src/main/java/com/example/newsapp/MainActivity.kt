@@ -1,5 +1,6 @@
 package com.example.newsapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -10,13 +11,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import com.bumptech.glide.Glide
-import com.example.newsapp.background.NewsWorkManager
+import com.example.newsapp.background.OnAppKilledService
 import com.google.android.material.navigation.NavigationView
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -57,17 +54,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         toolbar.setupWithNavController(navController, appBarConfiguration)
 
-        // Set up work request only when app is background
-        // And change this request to Periodic Request
-        // And also keep the time delay between 2 hours - 4 hours
-        val oneTimeRequest = OneTimeWorkRequest
-            .Builder(NewsWorkManager::class.java)
-            .setInitialDelay(1, TimeUnit.MINUTES)
-            .build()
-
-        WorkManager
-            .getInstance(this)
-            .enqueueUniqueWork("One_Time_Worker", ExistingWorkPolicy.REPLACE, oneTimeRequest)
+        startService(Intent(this, OnAppKilledService::class.java))
     }
 
     override fun onSupportNavigateUp(): Boolean {

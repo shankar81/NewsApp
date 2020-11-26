@@ -22,6 +22,10 @@ class NewsRepository(context: Context) {
         return newsDao.addNews(news)
     }
 
+    fun truncateTable() {
+        database.clearAllTables()
+    }
+
     suspend fun getFavourites(): List<Favourite> {
         return favouriteDao.getFavourites()
     }
