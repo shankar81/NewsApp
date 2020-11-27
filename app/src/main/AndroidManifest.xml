@@ -15,6 +15,11 @@
         android:theme="@style/Theme.NewsApp"
         tools:ignore="AllowBackup">
 
+        <!-- AdMob using sample id -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2542443467561603~8054373391" />
+
         <service
             android:name=".background.NewsBackgroundService"
             android:enabled="true"
