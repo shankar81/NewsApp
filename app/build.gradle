@@ -92,6 +92,9 @@ dependencies {
     // optional - GCMNetworkManager support
     implementation "androidx.work:work-gcm:$work_version"
 
+    // Custom Tabs
+    implementation "androidx.browser:browser:1.2.0"
+
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
