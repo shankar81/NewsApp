@@ -219,12 +219,26 @@ class NewsFragment(private val category: String = "") : Fragment() {
     }
 
     private inner class NewsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        init {
+            itemView.alpha = 0.1f
+            itemView.scaleX = 0F
+            itemView.scaleY = 0F
+        }
+
         private val category: TextView = itemView.findViewById(R.id.news_category)
         private val title: TextView = itemView.findViewById(R.id.news_title)
         private val image: ImageView = itemView.findViewById(R.id.news_image)
         private val favouriteButton: ImageView = itemView.findViewById(R.id.favouriteButton)
 
         fun bind(news: News) {
+            itemView.animate()
+                .scaleY(1f)
+                .scaleX(1f)
+                .alpha(1f)
+                .setStartDelay(100)
+                .setDuration(200)
+                .start()
+
             title.text = news.title
             category.text = news.source.name
 
