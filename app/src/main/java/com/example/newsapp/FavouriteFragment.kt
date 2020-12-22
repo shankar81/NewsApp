@@ -5,8 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -15,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.newsapp.databinding.FragmentFavouriteBinding
+import com.example.newsapp.databinding.NewsListItemBinding
 import com.example.newsapp.models.Favourite
 
 private const val TAG = "FavouriteFragment"
@@ -23,24 +23,29 @@ class FavouriteFragment : Fragment() {
 
     private val news = arrayListOf<Favourite>()
     private val adapter = NewsAdapter(news)
-    private lateinit var newsRecyclerView: RecyclerView
     private lateinit var mainViewModel: MainViewModel
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private var _binding: FragmentFavouriteBinding? = null
+
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_favourite, container, false)
+    ): View {
+        _binding = FragmentFavouriteBinding.inflate(inflater, container, false)
+
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
-        newsRecyclerView = view.findViewById(R.id.news_recycler_view)
-        newsRecyclerView.setHasFixedSize(true)
-        newsRecyclerView.layoutManager =
+        binding.newsRecyclerView.setHasFixedSize(true)
+        binding.newsRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        newsRecyclerView.adapter = adapter
+        binding.newsRecyclerView.adapter = adapter
 
-        return view
+        return binding.root
     }
 
     private fun doAPICall() {
@@ -58,26 +63,23 @@ class FavouriteFragment : Fragment() {
     }
 
     private inner class NewsHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val category: TextView = itemView.findViewById(R.id.news_category)
-        private val title: TextView = itemView.findViewById(R.id.news_title)
-        private val image: ImageView = itemView.findViewById(R.id.news_image)
-        private val favouriteButton: ImageView = itemView.findViewById(R.id.favouriteButton)
+        private val itemBinding = NewsListItemBinding.bind(itemView)
 
         init {
-            favouriteButton.setImageResource(R.drawable.icon_delete)
+            itemBinding.favouriteButton.setImageResource(R.drawable.icon_delete)
         }
 
         fun bind(favourite: Favourite, position: Int) {
-            title.text = favourite.title
-            category.text = favourite.source.name
+            itemBinding.newsTitle.text = favourite.title
+            itemBinding.newsCategory.text = favourite.source.name
 
             Glide.with(this@FavouriteFragment)
                 .asBitmap()
                 .transform(CenterCrop(), RoundedCorners(20))
                 .load(favourite.urlToImage)
-                .into(image)
+                .into(itemBinding.newsImage)
 
-            favouriteButton.setOnClickListener {
+            itemBinding.favouriteButton.setOnClickListener {
                 mainViewModel.removeFavourite(favourite)
                 Toast.makeText(context, "Removed from favourites", Toast.LENGTH_SHORT).show()
                 news.remove(favourite)
@@ -86,7 +88,7 @@ class FavouriteFragment : Fragment() {
 
             itemView.setOnLongClickListener {
                 Log.d(TAG, "setOnLongClickListener: ")
-                // Select multiple
+                // @Todo Select multiple
                 true // Consume Event don't propagate
             }
         }
@@ -103,5 +105,12 @@ class FavouriteFragment : Fragment() {
         }
 
         override fun getItemCount() = newsList.size
+    }
+
+    // Note: Fragments outlive their views. Make sure you clean up any references to the binding class instance
+    // in the fragment's onDestroyView() method.
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

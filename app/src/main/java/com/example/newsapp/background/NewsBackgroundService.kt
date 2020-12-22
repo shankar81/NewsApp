@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.IBinder
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
@@ -68,7 +67,6 @@ class NewsBackgroundService : Service() {
                 val res =
                     NetworkService.retrofitService.create(NewsApi::class.java)
                         .getNews("", category, "in")
-                Log.d(TAG, "getNewsOnline: DO API CALL WORKER $category $categories")
                 res.articles.map {
                     it.category = category
                     it.id = UUID.randomUUID().toString()
@@ -91,6 +89,7 @@ class NewsBackgroundService : Service() {
     }
 
     private fun getNotification(currentCategory: String = categories[0]): Notification {
+
         return NotificationCompat.Builder(baseContext, NewsApplication.CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_round)
             .setProgress(7, 7 - (categories.size - 1), false)

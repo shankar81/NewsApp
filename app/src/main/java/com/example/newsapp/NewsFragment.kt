@@ -7,11 +7,8 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.browser.customtabs.*
@@ -25,6 +22,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.newsapp.databinding.FragmentNewsBinding
+import com.example.newsapp.databinding.NewsListItemBinding
 import com.example.newsapp.models.News
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,9 +35,14 @@ private const val TAG = "NewsFragment"
 
 class NewsFragment(private val category: String = "") : Fragment() {
 
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private var _binding: FragmentNewsBinding? = null
+
+    private val binding get() = _binding!!
+
     private val news = arrayListOf<News>()
     private val adapter = NewsAdapter(news)
-    private lateinit var newsRecyclerView: RecyclerView
     private lateinit var mainViewModel: MainViewModel
     private var country = "in"
     private var searchQuery = ""
@@ -65,8 +69,9 @@ class NewsFragment(private val category: String = "") : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = layoutInflater.inflate(R.layout.fragment_news, container, false)
+    ): View {
+        _binding = FragmentNewsBinding.inflate(inflater, container, false)
+
         // Binding to service
         CustomTabsClient.bindCustomTabsService(
             requireContext(),
@@ -77,13 +82,12 @@ class NewsFragment(private val category: String = "") : Fragment() {
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         setHasOptionsMenu(true)
 
-        newsRecyclerView = view.findViewById(R.id.news_recycler_view)
-        newsRecyclerView.setHasFixedSize(true)
-        newsRecyclerView.layoutManager =
+        binding.newsRecyclerView.setHasFixedSize(true)
+        binding.newsRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        newsRecyclerView.adapter = adapter
+        binding.newsRecyclerView.adapter = adapter
 
-        return view
+        return binding.root
     }
 
     private fun doAPICall() {
@@ -163,9 +167,8 @@ class NewsFragment(private val category: String = "") : Fragment() {
                     otherLikelyUrls.add(bundle)
                 }
             }
-            val res =
-                mCustomTabsSession?.mayLaunchUrl(Uri.parse(newsList[0].url), null, otherLikelyUrls)
-            Log.d(TAG, "onViewCreated: $res")
+
+            mCustomTabsSession?.mayLaunchUrl(Uri.parse(newsList[0].url), null, otherLikelyUrls)
         })
         doAPICall()
     }
@@ -187,7 +190,7 @@ class NewsFragment(private val category: String = "") : Fragment() {
 
         val color = ResourcesCompat.getColor(resources, R.color.purple_500, null)
         builder.setToolbarColor(color)
-        builder.addDefaultShareMenuItem()
+        builder.setShareState(CustomTabsIntent.SHARE_STATE_ON)
 
         // Add menu item
         builder.addMenuItem("Custom Menu Item", pi)
@@ -225,10 +228,7 @@ class NewsFragment(private val category: String = "") : Fragment() {
             itemView.scaleY = 0F
         }
 
-        private val category: TextView = itemView.findViewById(R.id.news_category)
-        private val title: TextView = itemView.findViewById(R.id.news_title)
-        private val image: ImageView = itemView.findViewById(R.id.news_image)
-        private val favouriteButton: ImageView = itemView.findViewById(R.id.favouriteButton)
+        private val binding = NewsListItemBinding.bind(itemView)
 
         fun bind(news: News) {
             itemView.animate()
@@ -239,16 +239,16 @@ class NewsFragment(private val category: String = "") : Fragment() {
                 .setDuration(200)
                 .start()
 
-            title.text = news.title
-            category.text = news.source.name
+            binding.newsTitle.text = news.title
+            binding.newsCategory.text = news.source.name
 
             Glide.with(this@NewsFragment)
                 .asBitmap()
                 .transform(CenterCrop(), RoundedCorners(20))
                 .load(news.urlToImage)
-                .into(image)
+                .into(binding.newsImage)
 
-            favouriteButton.setOnClickListener {
+            binding.favouriteButton.setOnClickListener {
                 mainViewModel.addFavourite(news)
                 Toast.makeText(context, "Added to favourites", Toast.LENGTH_SHORT)
                     .show()
@@ -271,5 +271,12 @@ class NewsFragment(private val category: String = "") : Fragment() {
         }
 
         override fun getItemCount() = newsList.size
+    }
+
+    // Note: Fragments outlive their views. Make sure you clean up any references to the binding class instance
+    // in the fragment's onDestroyView() method.
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

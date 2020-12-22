@@ -4,72 +4,68 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.bumptech.glide.Glide
 import com.example.newsapp.background.OnAppKilledService
+import com.example.newsapp.databinding.ActivityMainBinding
+import com.example.newsapp.databinding.DrawerHeaderBinding
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.navigation.NavigationView
 
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var navigationView: NavigationView
     private lateinit var navController: NavController
-    private lateinit var drawerLayout: DrawerLayout
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var headerBinding: DrawerHeaderBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        val headerView: View = binding.navigationView.getHeaderView(0)
+
+        headerBinding = DrawerHeaderBinding.bind(headerView)
+
+        setContentView(binding.root)
 
         MobileAds.initialize(
             this
         ) { Log.d(TAG, "onInitializationComplete: ") }
 
-        val adView: AdView = findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        binding.adView.loadAd(adRequest)
 
-        val toolbar: Toolbar = findViewById(R.id.topAppBar)
-        drawerLayout = findViewById(R.id.drawerLayout)
-        navigationView = findViewById(R.id.navigationView)
+        val toolbar: Toolbar = binding.topAppBar
 
-        val headerView: View = navigationView.getHeaderView(0)
-
-        val drawerImage: ImageView = headerView.findViewById(R.id.drawerImage)
-        val drawerName: TextView = headerView.findViewById(R.id.drawerName)
-        val drawerEmail: TextView = headerView.findViewById(R.id.drawerEmail)
-
-        drawerName.text = getString(R.string.name)
-        drawerEmail.text = getString(R.string.email)
+        headerBinding.drawerName.text = getString(R.string.name)
+        headerBinding.drawerEmail.text = getString(R.string.email)
         Glide
             .with(this)
             .load(R.raw.travel)
             .circleCrop()
-            .into(drawerImage)
+            .into(headerBinding.drawerImage)
 
         setSupportActionBar(toolbar)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout)
+        NavigationUI.setupActionBarWithNavController(this, navController, binding.drawerLayout)
 
-        appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
-        navigationView.setupWithNavController(navController)
+        appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
+        binding.navigationView.setupWithNavController(navController)
         setupActionBarWithNavController(navController, appBarConfiguration)
         toolbar.setupWithNavController(navController, appBarConfiguration)
 
@@ -78,14 +74,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        navigationView.setNavigationItemSelectedListener { menuItem ->
+        binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.logout -> {
                     toggleTheme()
                     true
                 }
                 else -> {
-                    drawerLayout.closeDrawer(GravityCompat.START)
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
                     menuItem.onNavDestinationSelected(navController)
                 }
             }
